@@ -13,6 +13,7 @@
 - 自动识别当前最空闲账号
 - 系统托盘常驻，点击托盘图标显示 / 隐藏
 - 两套 Liquid Glass 主题：澄明 Clear / 棱彩 Prism，可在顶部快速切换或设置中持久化选择
+- SVG 位移折射：基于圆角 SDF + `feDisplacementMap` 对动态背景做真实边缘折射，而非仅模糊/渐变模拟
 - 1–60 分钟自动刷新
 - 80% / 90% 默认黄色、红色阈值，可配置
 - 达到阈值时发送桌面通知
@@ -93,6 +94,10 @@ API Key 不会发往任何第三方服务。网络请求只发送到你为账号
 - [ ] API Key 导入 / 导出（不导出明文 Key）
 - [ ] macOS / Linux 发布产物
 - [ ] 账号标签（主号 / 开发 / 备用）
+
+## Liquid Glass 实现说明
+
+折射层参考了 [shuding/liquid-glass](https://github.com/shuding/liquid-glass) 的 SVG displacement 思路，并针对 Electron 常驻小工具重写：位移贴图仅在玻璃面创建或尺寸变化时生成，内部贴图分辨率受限，不随鼠标逐帧重算。第三方许可见 `THIRD_PARTY_NOTICES.md`。
 
 ## License
 
