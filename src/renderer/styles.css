@@ -32,11 +32,7 @@ body {
   margin: 0;
   overflow: hidden;
   color: var(--text);
-  background:
-    radial-gradient(circle at 12% -4%, rgba(125, 211, 252, 0.72), transparent 34%),
-    radial-gradient(circle at 88% 12%, rgba(196, 181, 253, 0.42), transparent 32%),
-    radial-gradient(circle at 52% 105%, rgba(167, 243, 208, 0.38), transparent 38%),
-    linear-gradient(160deg, #edf8ff 0%, #eef4fb 46%, #e8eef7 100%);
+  background: transparent;
 }
 
 body::before,
@@ -45,25 +41,25 @@ body::after {
   position: fixed;
   pointer-events: none;
   border-radius: 999px;
-  filter: blur(24px);
-  opacity: 0.56;
+  filter: blur(34px);
+  opacity: 0.42;
   z-index: 0;
 }
 
 body::before {
-  width: 210px;
-  height: 210px;
-  left: -92px;
-  top: 118px;
-  background: radial-gradient(circle at 36% 34%, rgba(255,255,255,.95), rgba(56,189,248,.28) 42%, rgba(59,130,246,.06) 72%);
+  width: 220px;
+  height: 220px;
+  left: -98px;
+  top: 104px;
+  background: radial-gradient(circle at 36% 34%, rgba(255,255,255,.62), rgba(56,189,248,.18) 44%, rgba(59,130,246,0) 74%);
 }
 
 body::after {
-  width: 240px;
-  height: 240px;
-  right: -126px;
-  bottom: 54px;
-  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,.92), rgba(167,139,250,.24) 46%, rgba(99,102,241,.04) 74%);
+  width: 250px;
+  height: 250px;
+  right: -132px;
+  bottom: 42px;
+  background: radial-gradient(circle at 40% 35%, rgba(255,255,255,.56), rgba(167,139,250,.16) 46%, rgba(99,102,241,0) 76%);
 }
 
 button,
@@ -95,6 +91,17 @@ select:focus-visible {
   gap: 10px;
   padding: 12px;
   overflow: hidden;
+  border: 1px solid rgba(255,255,255,.62);
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.30), rgba(255,255,255,.12) 44%, rgba(219,234,254,.10)),
+    rgba(241,248,255,.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.68),
+    inset 0 -1px 0 rgba(148,163,184,.10),
+    0 18px 48px rgba(15,23,42,.12);
+  -webkit-backdrop-filter: blur(30px) saturate(185%) contrast(102%);
+  backdrop-filter: blur(30px) saturate(185%) contrast(102%);
 }
 
 .titlebar {
@@ -104,7 +111,13 @@ select:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 4px 2px 7px;
+  padding: 6px 7px;
+  border: 1px solid rgba(255,255,255,.42);
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgba(255,255,255,.24), rgba(255,255,255,.10));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.48);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
 }
 
 .brand {
@@ -131,12 +144,14 @@ select:focus-visible {
   font-weight: 800;
   color: white;
   background:
-    linear-gradient(145deg, rgba(255,255,255,.22), rgba(255,255,255,.04)),
-    linear-gradient(145deg, #0f172a 10%, #2563eb 64%, #38bdf8);
-  border: 1px solid rgba(255,255,255,.52);
+    linear-gradient(145deg, rgba(255,255,255,.42), rgba(255,255,255,.12)),
+    linear-gradient(145deg, rgba(15,23,42,.62), rgba(37,99,235,.46) 64%, rgba(56,189,248,.38));
+  border: 1px solid rgba(255,255,255,.68);
   box-shadow:
-    0 8px 22px rgba(37,99,235,.24),
-    inset 0 1px 0 rgba(255,255,255,.28);
+    0 8px 22px rgba(37,99,235,.16),
+    inset 0 1px 0 rgba(255,255,255,.44);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
 }
 
 .logo::after {
@@ -180,7 +195,7 @@ select:focus-visible {
   padding: 3px;
   border: 1px solid rgba(255,255,255,.64);
   border-radius: 12px;
-  background: rgba(255,255,255,.32);
+  background: rgba(255,255,255,.18);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
   -webkit-backdrop-filter: blur(14px) saturate(155%);
   backdrop-filter: blur(14px) saturate(155%);
@@ -226,8 +241,8 @@ select:focus-visible {
   overflow: hidden;
   border: 1px solid var(--glass-border);
   background:
-    linear-gradient(145deg, rgba(255,255,255,.68), rgba(255,255,255,.36)),
-    var(--glass);
+    linear-gradient(145deg, rgba(255,255,255,.40), rgba(255,255,255,.16)),
+    rgba(255,255,255,.12);
   box-shadow:
     var(--shadow-soft),
     inset 0 1px 0 rgba(255,255,255,.74),
@@ -400,7 +415,7 @@ select:focus-visible {
 
 .small-btn:hover {
   color: var(--text-strong);
-  background: rgba(255,255,255,.78);
+  background: rgba(255,255,255,.42);
   border-color: rgba(255,255,255,.9);
 }
 
@@ -515,7 +530,7 @@ select:focus-visible {
   padding: 9px 12px;
   color: #334155;
   background:
-    linear-gradient(145deg, rgba(255,255,255,.56), rgba(255,255,255,.32));
+    linear-gradient(145deg, rgba(255,255,255,.32), rgba(255,255,255,.12));
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.72),
     0 5px 16px rgba(71,85,105,.06);
@@ -527,7 +542,7 @@ select:focus-visible {
 
 .add-btn:hover {
   border-color: rgba(255,255,255,.92);
-  background: rgba(255,255,255,.72);
+  background: rgba(255,255,255,.40);
 }
 
 footer {
@@ -568,9 +583,9 @@ footer {
   place-items: center;
   padding: clamp(10px, 4vw, 20px);
   overflow: hidden;
-  background: rgba(30, 41, 59, 0.16);
-  -webkit-backdrop-filter: blur(12px) saturate(130%);
-  backdrop-filter: blur(12px) saturate(130%);
+  background: rgba(15, 23, 42, 0.08);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
 }
 
 .hidden {
@@ -586,8 +601,8 @@ footer {
   border-radius: 20px;
   padding: 15px;
   background:
-    linear-gradient(145deg, rgba(255,255,255,.82), rgba(255,255,255,.56)),
-    var(--glass-strong);
+    linear-gradient(145deg, rgba(255,255,255,.48), rgba(255,255,255,.20)),
+    rgba(255,255,255,.16);
   box-shadow:
     0 24px 72px rgba(44,62,90,.2),
     inset 0 1px 0 rgba(255,255,255,.86);
@@ -635,7 +650,7 @@ select {
   border-radius: 10px;
   padding: 8px 9px;
   color: var(--text-strong);
-  background: rgba(255,255,255,.58);
+  background: rgba(255,255,255,.22);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.72),
     0 2px 8px rgba(71,85,105,.03);
@@ -692,16 +707,20 @@ select:focus {
 .primary {
   color: white;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0)),
-    linear-gradient(135deg, #172033, #2563eb);
-  border-color: rgba(255,255,255,.24);
-  box-shadow: 0 7px 18px rgba(37,99,235,.18);
+    linear-gradient(145deg, rgba(96,165,250,.42), rgba(37,99,235,.26)),
+    rgba(255,255,255,.14);
+  border-color: rgba(255,255,255,.52);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.42),
+    0 7px 18px rgba(37,99,235,.14);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  backdrop-filter: blur(14px) saturate(180%);
 }
 
 .secondary {
   color: #374151;
   border-color: rgba(148,163,184,.26);
-  background: rgba(255,255,255,.55);
+  background: rgba(255,255,255,.24);
 }
 
 .loading {
