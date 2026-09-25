@@ -76,7 +76,7 @@ function paintPointerInteraction() {
 
   const distance = Math.abs(pointerState.targetX - pointerState.currentX)
     + Math.abs(pointerState.targetY - pointerState.currentY);
-  if (pointerState.active || distance > 0.45) {
+  if (distance > 0.45) {
     pointerState.raf = requestAnimationFrame(paintPointerInteraction);
   }
 }
