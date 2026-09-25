@@ -2769,3 +2769,146 @@ footer {
   background: rgba(91,214,201,.055) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
 }
+
+
+/* Restraint pass — denser collapsed rows and quieter glass highlights */
+.account-card.is-collapsed {
+  min-height: 48px;
+  padding: 6px 10px;
+  border-radius: 16px;
+}
+
+.account-card.is-collapsed .account-accordion-head {
+  min-height: 34px;
+  gap: 8px;
+}
+
+.account-card.is-collapsed .account-title {
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+.account-card.is-collapsed .account-collapsed-summary {
+  max-height: 14px;
+  margin-top: 1px;
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.account-card.is-collapsed .account-collapsed-meta {
+  width: 94px;
+  max-width: 94px;
+  gap: 0;
+  font-size: 7px;
+  line-height: 1.25;
+}
+
+.account-card.is-collapsed .account-toggle {
+  width: 28px;
+  height: 28px;
+}
+
+.account-card.is-collapsed .account-toggle svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Reduce broad painted-on white glare; keep only a subtle optical sheen. */
+.summary-card::before,
+.account-card::before,
+.modal::before {
+  opacity: .28;
+  background:
+    radial-gradient(circle,
+      rgba(255,255,255,.36),
+      rgba(255,255,255,.10) 34%,
+      rgba(255,255,255,0) 68%);
+}
+
+.liquid-refractive::after {
+  opacity: .30 !important;
+  background:
+    linear-gradient(155deg,
+      rgba(255,255,255,.56) 0%,
+      rgba(255,255,255,.15) 18%,
+      rgba(255,255,255,.025) 42%,
+      rgba(116,168,220,.045) 70%,
+      rgba(255,255,255,.10) 100%) !important;
+}
+
+:root[data-theme="prism"] .liquid-refractive::after {
+  opacity: .34 !important;
+  background:
+    linear-gradient(145deg,
+      rgba(115,226,255,.22) 0%,
+      rgba(255,255,255,.42) 15%,
+      rgba(255,255,255,.035) 39%,
+      rgba(247,104,211,.10) 73%,
+      rgba(157,111,255,.12) 100%) !important;
+}
+
+:root[data-theme="midnight"] .liquid-refractive::after {
+  opacity: .16 !important;
+  background:
+    linear-gradient(145deg,
+      rgba(71,222,207,.12) 0%,
+      rgba(255,255,255,.09) 16%,
+      rgba(255,255,255,.012) 42%,
+      rgba(129,111,255,.06) 76%,
+      rgba(255,255,255,.03) 100%) !important;
+}
+
+.liquid-refractive {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.34),
+    inset 0 -1px 0 rgba(94,124,155,.055),
+    0 8px 22px rgba(29,52,80,.045) !important;
+}
+
+.account-card.liquid-refractive {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.38),
+    inset 0 -1px 0 rgba(88,119,151,.06),
+    0 9px 25px rgba(31,55,85,.05) !important;
+}
+
+:root[data-theme="midnight"] .liquid-refractive,
+:root[data-theme="midnight"] .account-card.liquid-refractive {
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    inset 0 -1px 0 rgba(74,104,145,.06),
+    0 9px 24px rgba(0,7,18,.13) !important;
+}
+
+/* Keep daytime glass readable without the large white hotspot. */
+:root[data-theme="clear"] .liquid-refractive,
+:root[data-theme="prism"] .liquid-refractive {
+  --liquid-brightness: 1.015;
+}
+
+:root[data-theme="clear"] .summary-card::before,
+:root[data-theme="clear"] .account-card::before {
+  opacity: .22;
+}
+
+:root[data-theme="prism"] .summary-card::before,
+:root[data-theme="prism"] .account-card::before {
+  opacity: .24;
+}
+
+:root[data-theme="midnight"] .summary-card::before,
+:root[data-theme="midnight"] .account-card::before,
+:root[data-theme="midnight"] .modal::before {
+  opacity: .12;
+}
+
+@media (max-width: 390px) {
+  .account-card.is-collapsed {
+    min-height: 46px;
+    padding: 5px 9px;
+  }
+
+  .account-card.is-collapsed .account-accordion-head {
+    min-height: 34px;
+  }
+}
