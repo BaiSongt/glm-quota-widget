@@ -47,6 +47,7 @@
       this.element = element;
       this.id = `glm-liquid-refraction-${++sequence}`;
       this.frame = 0;
+      this.resizeTimer = 0;
       this.lastSignature = '';
 
       this.canvas = document.createElement('canvas');
@@ -82,7 +83,7 @@
       this.element.classList.add('liquid-refractive');
       this.element.style.setProperty('--liquid-refraction-filter', `url("#${this.id}")`);
 
-      this.resizeObserver = new ResizeObserver(() => this.schedule());
+      this.resizeObserver = new ResizeObserver(() => this.scheduleResize());
       this.resizeObserver.observe(this.element);
       this.schedule();
     }
@@ -93,6 +94,14 @@
         this.frame = 0;
         this.rebuild();
       });
+    }
+
+    scheduleResize() {
+      clearTimeout(this.resizeTimer);
+      this.resizeTimer = setTimeout(() => {
+        this.lastSignature = '';
+        this.schedule();
+      }, 110);
     }
 
     rebuild() {
@@ -176,6 +185,7 @@
 
     destroy() {
       if (this.frame) cancelAnimationFrame(this.frame);
+      clearTimeout(this.resizeTimer);
       this.resizeObserver.disconnect();
       this.svg.remove();
       this.element.classList.remove('liquid-refractive');

@@ -29,17 +29,62 @@ const els = {
 };
 
 let state = { config: { accounts: [] }, quota: {} };
+let expandedAccountId = null;
+let accordionInitialized = false;
+
+const accountIcons = {
+  refresh: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66M20 5v6h-6"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11a2.5 2.5 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg>',
+  delete: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>',
+  chevron: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>',
+};
+
+function iconButton(action, accountId, label, extraClass = '') {
+  return `<button class="account-icon-btn ${extraClass}" data-action="${action}" data-id="${accountId}" title="${label}" aria-label="${label}">${accountIcons[action]}</button>`;
+}
+
+function compactQuotaSummary(data) {
+  const session = Number.isFinite(data?.session?.percentage) ? `5 小时 ${data.session.percentage}%` : '5 小时 —';
+  if (!data?.tools) return session;
+  const used = Number(data.tools.used || 0).toLocaleString();
+  const total = Number(data.tools.total || 0).toLocaleString();
+  return `${session} · MCP ${used} / ${total}`;
+}
+
+function weeklySummary(data) {
+  return Number.isFinite(data?.weekly?.percentage) ? `7 天 ${data.weekly.percentage}%` : '7 天无数据';
+}
+
+function applyAccordionState(nextId) {
+  expandedAccountId = nextId;
+  els.accounts.querySelectorAll('.account-card[data-account-id]').forEach((card) => {
+    const expanded = card.dataset.accountId === nextId;
+    card.classList.toggle('is-expanded', expanded);
+    card.classList.toggle('is-collapsed', !expanded);
+    const toggle = card.querySelector('[data-action="toggle"]');
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', String(expanded));
+      toggle.title = expanded ? '收起账号详情' : '展开账号详情';
+      toggle.setAttribute('aria-label', expanded ? '收起账号详情' : '展开账号详情');
+    }
+  });
+}
 
 function normalizeTheme(value) {
-  return value === 'prism' ? 'prism' : 'clear';
+  return value === 'prism' || value === 'midnight' ? value : 'clear';
 }
 
 function applyTheme(value) {
   const theme = normalizeTheme(value);
   document.documentElement.dataset.theme = theme;
   if (els.themeBtn) {
-    els.themeBtn.textContent = theme === 'prism' ? '✦' : '◐';
-    els.themeBtn.title = theme === 'prism' ? '当前：棱彩 Prism · 点击切换' : '当前：澄明 Clear · 点击切换';
+    const visuals = {
+      clear: { icon: '◐', title: '当前：澄明 Clear · 点击切换' },
+      prism: { icon: '✦', title: '当前：棱彩 Prism · 点击切换' },
+      midnight: { icon: '☾', title: '当前：午夜 Midnight · 点击切换' },
+    };
+    els.themeBtn.textContent = visuals[theme].icon;
+    els.themeBtn.title = visuals[theme].title;
   }
 }
 
@@ -216,6 +261,8 @@ function render() {
   renderSummary(accounts);
 
   if (!accounts.length) {
+    accordionInitialized = false;
+    expandedAccountId = null;
     els.accounts.innerHTML = `
       <div class="empty">
         <div class="empty-content">
@@ -228,6 +275,13 @@ function render() {
     return;
   }
 
+  if (!accordionInitialized) {
+    expandedAccountId = accounts[0]?.id || null;
+    accordionInitialized = true;
+  } else if (expandedAccountId && !accounts.some((account) => account.id === expandedAccountId)) {
+    expandedAccountId = accounts[0]?.id || null;
+  }
+
   const pcts = accounts.map((a) => state.quota[a.id]?.data?.session?.percentage).filter(Number.isFinite);
   const minPct = pcts.length ? Math.min(...pcts) : null;
   let latest = 0;
@@ -238,23 +292,39 @@ function render() {
     latest = Math.max(latest, Number(d.fetchedAt || 0));
     const isBest = Number.isFinite(d.session?.percentage) && d.session.percentage === minPct;
     const platformLabel = account.platform === 'zai' ? 'Z.ai' : 'BigModel';
+    const expanded = account.id === expandedAccountId;
+    const resetText = d.session?.nextResetTime ? fmtReset(d.session.nextResetTime) : '暂无重置时间';
     return `
-      <article class="account-card ${q.loading ? 'loading' : ''}">
-        <div class="account-head">
-          <div>
+      <article class="account-card accordion-card ${expanded ? 'is-expanded' : 'is-collapsed'} ${q.loading ? 'loading' : ''}" data-account-id="${account.id}">
+        <div class="account-accordion-head">
+          <div class="account-identity">
             <div class="account-title">${esc(account.name)}${isBest ? '<span class="best">当前最空闲</span>' : ''}</div>
+            <div class="account-collapsed-summary">${esc(compactQuotaSummary(d))}</div>
             <div class="account-meta">${platformLabel}${d.plan ? ` · ${esc(d.plan)}` : ''}</div>
           </div>
-          <div class="account-actions">
-            <button class="small-btn" data-action="refresh" data-id="${account.id}">刷新</button>
-            <button class="small-btn" data-action="edit" data-id="${account.id}">编辑</button>
-            <button class="small-btn" data-action="delete" data-id="${account.id}">删除</button>
+          <div class="account-head-side">
+            <div class="account-collapsed-meta">
+              <span>${esc(resetText)}</span>
+              <span>${esc(weeklySummary(d))}</span>
+            </div>
+            <div class="account-actions">
+              ${iconButton('refresh', account.id, '刷新账号')}
+              ${iconButton('edit', account.id, '编辑账号')}
+              ${iconButton('delete', account.id, '删除账号', 'danger')}
+            </div>
+            <button class="account-toggle" data-action="toggle" data-id="${account.id}" aria-expanded="${expanded}" title="${expanded ? '收起账号详情' : '展开账号详情'}" aria-label="${expanded ? '收起账号详情' : '展开账号详情'}">
+              ${accountIcons.chevron}
+            </button>
           </div>
         </div>
-        ${metric('5 小时', d.session)}
-        ${metric('7 天', d.weekly)}
-        ${toolsMetric(d.tools)}
-        ${q.error ? `<div class="error">${esc(q.error)}</div>` : ''}
+        <div class="account-body-shell">
+          <div class="account-body">
+            ${metric('5 小时', d.session)}
+            ${metric('7 天', d.weekly)}
+            ${toolsMetric(d.tools)}
+            ${q.error ? `<div class="error">${esc(q.error)}</div>` : ''}
+          </div>
+        </div>
       </article>`;
   }).join('');
 
@@ -298,7 +368,8 @@ els.addBtn.addEventListener('click', () => showAccountModal());
 els.settingsBtn.addEventListener('click', showSettingsModal);
 els.refreshBtn.addEventListener('click', () => window.glmQuota.refresh());
 els.themeBtn.addEventListener('click', async () => {
-  const nextTheme = normalizeTheme(state.config.theme) === 'clear' ? 'prism' : 'clear';
+  const currentTheme = normalizeTheme(state.config.theme);
+  const nextTheme = currentTheme === 'clear' ? 'prism' : currentTheme === 'prism' ? 'midnight' : 'clear';
   applyTheme(nextTheme);
   try {
     state = await window.glmQuota.saveSettings({
@@ -329,6 +400,10 @@ els.accounts.addEventListener('click', async (event) => {
   const id = button.dataset.id;
   const action = button.dataset.action;
   const account = state.config.accounts.find((a) => a.id === id);
+  if (action === 'toggle') {
+    applyAccordionState(expandedAccountId === id ? null : id);
+    return;
+  }
   if (action === 'refresh') await window.glmQuota.refresh(id);
   if (action === 'edit' && account) showAccountModal(account);
   if (action === 'delete' && account && confirm(`删除账号“${account.name}”？`)) await window.glmQuota.deleteAccount(id);

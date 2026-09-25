@@ -25,7 +25,7 @@ function loadConfig() {
       ...parsed,
       window: { ...DEFAULT_CONFIG.window, ...(parsed.window || {}) },
       accounts: Array.isArray(parsed.accounts) ? parsed.accounts : [],
-      theme: parsed.theme === 'prism' ? 'prism' : 'clear',
+      theme: ['clear', 'prism', 'midnight'].includes(parsed.theme) ? parsed.theme : 'clear',
     };
   } catch {
     return structuredClone(DEFAULT_CONFIG);
@@ -65,7 +65,7 @@ function publicConfig(config) {
     warnAt: config.warnAt,
     criticalAt: config.criticalAt,
     launchAtLogin: config.launchAtLogin,
-    theme: config.theme === 'prism' ? 'prism' : 'clear',
+    theme: ['clear', 'prism', 'midnight'].includes(config.theme) ? config.theme : 'clear',
     accounts: config.accounts.map(({ secret, ...account }) => ({ ...account, hasKey: Boolean(secret) })),
   };
 }

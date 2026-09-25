@@ -252,7 +252,7 @@ function setupIpc() {
     config.warnAt = Math.max(1, Math.min(99, Number(settings.warnAt) || 80));
     config.criticalAt = Math.max(config.warnAt + 1, Math.min(100, Number(settings.criticalAt) || 90));
     config.launchAtLogin = Boolean(settings.launchAtLogin);
-    config.theme = settings.theme === 'prism' ? 'prism' : 'clear';
+    config.theme = ['clear', 'prism', 'midnight'].includes(settings.theme) ? settings.theme : 'clear';
     app.setLoginItemSettings({ openAtLogin: config.launchAtLogin });
     saveConfig(config);
     scheduleRefresh();
