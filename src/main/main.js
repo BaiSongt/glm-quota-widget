@@ -12,14 +12,21 @@ let isQuitting = false;
 const quotaByAccount = new Map();
 const notifiedBucket = new Map();
 
+function assetPath(name) {
+  return path.join(__dirname, '../../assets/icons', name);
+}
+
 function trayImage() {
-  const svg = `
+  const image = nativeImage.createFromPath(assetPath('tray.png'));
+  if (!image.isEmpty()) {
+    return image.resize({ width: 20, height: 20, quality: 'best' });
+  }
+  const fallbackSvg = `
   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-    <rect width="32" height="32" rx="8" fill="#111827"/>
-    <path d="M8 17.5 13 9l3 6 3-6 5 8.5-4 5.5h-8z" fill="#60a5fa"/>
-    <circle cx="16" cy="17" r="2.4" fill="#f8fafc"/>
+    <rect x="2" y="2" width="28" height="28" rx="9" fill="#5b9cf3" stroke="#f8fbff" stroke-width="2"/>
+    <path d="M22.5 10.5a8 8 0 1 0 0 11v-5.2h-6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
   </svg>`;
-  return nativeImage.createFromDataURL(`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`);
+  return nativeImage.createFromDataURL(`data:image/svg+xml;base64,${Buffer.from(fallbackSvg).toString('base64')}`);
 }
 
 function getWindowBounds() {
@@ -47,6 +54,7 @@ function createWindow() {
     resizable: true,
     skipTaskbar: true,
     title: 'GLM Quota Widget',
+    icon: assetPath(process.platform === 'win32' ? 'app.ico' : 'app.png'),
     backgroundColor: '#00000000',
     backgroundMaterial: process.platform === 'win32' ? 'acrylic' : 'auto',
     roundedCorners: true,
@@ -264,6 +272,7 @@ if (!gotLock) {
 } else {
   app.on('second-instance', showWindow);
   app.whenReady().then(async () => {
+    if (process.platform === 'win32') app.setAppUserModelId('com.baisongt.glmquotawidget');
     config = loadConfig();
     setupIpc();
     createWindow();

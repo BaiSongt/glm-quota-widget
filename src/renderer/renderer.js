@@ -91,7 +91,14 @@ function render() {
   renderSummary(accounts);
 
   if (!accounts.length) {
-    els.accounts.innerHTML = '<div class="empty"><div><strong>还没有 GLM 账号</strong><br><br>添加 API Key 后，这里会同时显示多个账号的 5 小时、周额度和 MCP/Web 用量。</div></div>';
+    els.accounts.innerHTML = `
+      <div class="empty">
+        <div class="empty-content">
+          <div class="empty-mark" aria-hidden="true"><span>G</span></div>
+          <div class="empty-title">还没有 GLM 账号</div>
+          <div class="empty-copy">添加 API Key 后，可同时查看多个账号的<br><strong>5 小时额度 · 7 天额度 · MCP / Web 用量</strong></div>
+        </div>
+      </div>`;
     els.updatedAt.textContent = '尚未配置账号';
     return;
   }

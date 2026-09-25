@@ -43,7 +43,8 @@
           ]
         }
       ],
-      "artifactName": "GLM-Quota-Widget-${version}-${arch}.${ext}"
+      "artifactName": "GLM-Quota-Widget-${version}-${arch}.${ext}",
+      "icon": "assets/icons/app.ico"
     },
     "nsis": {
       "oneClick": false,
