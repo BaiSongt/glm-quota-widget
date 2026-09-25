@@ -54,7 +54,7 @@ function createWindow() {
     resizable: true,
     skipTaskbar: true,
     title: 'GLM Quota Widget',
-    icon: assetPath(process.platform === 'win32' ? 'app.ico' : 'app.png'),
+    icon: assetPath('app.png'),
     backgroundColor: '#00000000',
     backgroundMaterial: process.platform === 'win32' ? 'acrylic' : 'auto',
     roundedCorners: true,
