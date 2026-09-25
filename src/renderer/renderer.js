@@ -24,6 +24,8 @@ const els = {
   criticalAt: document.getElementById('criticalAt'),
   launchAtLogin: document.getElementById('launchAtLogin'),
   themeOptions: Array.from(document.querySelectorAll('input[name="theme"]')),
+  appShell: document.querySelector('.app-shell'),
+  rippleLayer: document.querySelector('.ripple-layer'),
 };
 
 let state = { config: { accounts: [] }, quota: {} };
@@ -40,6 +42,113 @@ function applyTheme(value) {
     els.themeBtn.title = theme === 'prism' ? '当前：棱彩 Prism · 点击切换' : '当前：澄明 Clear · 点击切换';
   }
 }
+
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const pointerState = {
+  targetX: 0,
+  targetY: 0,
+  currentX: 0,
+  currentY: 0,
+  active: false,
+  raf: 0,
+};
+
+function paintPointerInteraction() {
+  pointerState.raf = 0;
+  if (!els.appShell || reducedMotion.matches) return;
+
+  const ease = pointerState.active ? 0.15 : 0.09;
+  pointerState.currentX += (pointerState.targetX - pointerState.currentX) * ease;
+  pointerState.currentY += (pointerState.targetY - pointerState.currentY) * ease;
+
+  const rect = els.appShell.getBoundingClientRect();
+  const safeWidth = Math.max(rect.width, 1);
+  const safeHeight = Math.max(rect.height, 1);
+  const nx = (pointerState.currentX / safeWidth - 0.5) * 2;
+  const ny = (pointerState.currentY / safeHeight - 0.5) * 2;
+
+  els.appShell.style.setProperty('--pointer-x', `${pointerState.currentX}px`);
+  els.appShell.style.setProperty('--pointer-y', `${pointerState.currentY}px`);
+  els.appShell.style.setProperty('--parallax-x', `${(nx * 8).toFixed(2)}px`);
+  els.appShell.style.setProperty('--parallax-y', `${(ny * 8).toFixed(2)}px`);
+  els.appShell.classList.toggle('is-pointer-active', pointerState.active);
+
+  const distance = Math.abs(pointerState.targetX - pointerState.currentX)
+    + Math.abs(pointerState.targetY - pointerState.currentY);
+  if (pointerState.active || distance > 0.45) {
+    pointerState.raf = requestAnimationFrame(paintPointerInteraction);
+  }
+}
+
+function schedulePointerPaint() {
+  if (!pointerState.raf) pointerState.raf = requestAnimationFrame(paintPointerInteraction);
+}
+
+function initializePointerInteraction() {
+  if (!els.appShell) return;
+
+  const rect = els.appShell.getBoundingClientRect();
+  pointerState.targetX = pointerState.currentX = rect.width / 2;
+  pointerState.targetY = pointerState.currentY = rect.height / 2;
+  els.appShell.style.setProperty('--pointer-x', `${rect.width / 2}px`);
+  els.appShell.style.setProperty('--pointer-y', `${rect.height / 2}px`);
+
+  els.appShell.addEventListener('pointerenter', (event) => {
+    if (reducedMotion.matches) return;
+    const bounds = els.appShell.getBoundingClientRect();
+    pointerState.targetX = event.clientX - bounds.left;
+    pointerState.targetY = event.clientY - bounds.top;
+    pointerState.active = true;
+    schedulePointerPaint();
+  });
+
+  els.appShell.addEventListener('pointermove', (event) => {
+    if (reducedMotion.matches || event.pointerType === 'touch') return;
+    const bounds = els.appShell.getBoundingClientRect();
+    pointerState.targetX = Math.max(0, Math.min(bounds.width, event.clientX - bounds.left));
+    pointerState.targetY = Math.max(0, Math.min(bounds.height, event.clientY - bounds.top));
+    pointerState.active = true;
+    schedulePointerPaint();
+  });
+
+  els.appShell.addEventListener('pointerleave', () => {
+    if (reducedMotion.matches) return;
+    pointerState.active = false;
+    pointerState.targetX = els.appShell.clientWidth / 2;
+    pointerState.targetY = els.appShell.clientHeight / 2;
+    schedulePointerPaint();
+  });
+
+  els.appShell.addEventListener('pointerdown', (event) => {
+    if (reducedMotion.matches || !els.rippleLayer) return;
+    const bounds = els.appShell.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    ripple.className = 'liquid-ripple';
+    ripple.style.left = `${event.clientX - bounds.left}px`;
+    ripple.style.top = `${event.clientY - bounds.top}px`;
+
+    while (els.rippleLayer.childElementCount >= 5) {
+      els.rippleLayer.firstElementChild?.remove();
+    }
+    els.rippleLayer.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+  });
+
+  reducedMotion.addEventListener?.('change', () => {
+    if (reducedMotion.matches) {
+      pointerState.active = false;
+      if (pointerState.raf) cancelAnimationFrame(pointerState.raf);
+      pointerState.raf = 0;
+      els.appShell.classList.remove('is-pointer-active');
+      els.appShell.style.removeProperty('--parallax-x');
+      els.appShell.style.removeProperty('--parallax-y');
+      els.rippleLayer?.replaceChildren();
+    }
+  });
+}
+
+initializePointerInteraction();
 
 function esc(value) {
   return String(value ?? '').replace(/[&<>'"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c]));

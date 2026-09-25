@@ -1541,3 +1541,311 @@ input::placeholder {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Dynamic liquid field + pointer optics */
+.app-shell {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --pointer-active: 0;
+  --parallax-x: 0px;
+  --parallax-y: 0px;
+}
+
+.app-shell > :not(.liquid-scene) {
+  position: relative;
+  z-index: 4;
+}
+
+.liquid-scene {
+  position: absolute;
+  z-index: 0;
+  inset: 1px;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  contain: paint;
+}
+
+.liquid-field {
+  position: absolute;
+  z-index: 0;
+  inset: -18%;
+  transform: translate3d(var(--parallax-x), var(--parallax-y), 0) scale(1.06);
+  transform-origin: center;
+  will-change: transform;
+}
+
+.flow-orb {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  opacity: var(--flow-opacity, .42);
+  filter: blur(var(--flow-blur, 44px));
+  mix-blend-mode: screen;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.flow-orb-a {
+  width: 56%;
+  aspect-ratio: 1;
+  left: -4%;
+  top: -5%;
+  background: radial-gradient(circle at 40% 42%, var(--flow-cyan-core), var(--flow-cyan) 42%, transparent 72%);
+  animation: liquidDriftA 22s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+}
+
+.flow-orb-b {
+  width: 52%;
+  aspect-ratio: 1;
+  right: -4%;
+  top: 4%;
+  background: radial-gradient(circle at 52% 46%, var(--flow-violet-core), var(--flow-violet) 44%, transparent 73%);
+  animation: liquidDriftB 27s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+}
+
+.flow-orb-c {
+  width: 58%;
+  aspect-ratio: 1;
+  right: -10%;
+  bottom: -6%;
+  background: radial-gradient(circle at 44% 42%, var(--flow-pink-core), var(--flow-pink) 43%, transparent 72%);
+  animation: liquidDriftC 25s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+}
+
+.flow-orb-d {
+  width: 48%;
+  aspect-ratio: 1;
+  left: -7%;
+  bottom: -4%;
+  background: radial-gradient(circle at 50% 48%, var(--flow-aqua-core), var(--flow-aqua) 45%, transparent 74%);
+  animation: liquidDriftD 31s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+}
+
+.flow-orb-e {
+  width: 48%;
+  aspect-ratio: 1;
+  left: 32%;
+  top: 29%;
+  opacity: var(--flow-e-opacity, .30);
+  background: radial-gradient(circle at 50% 50%, var(--flow-blue-core), var(--flow-blue) 43%, transparent 75%);
+  animation: liquidDriftE 29s cubic-bezier(.45,.05,.55,.95) infinite alternate;
+}
+
+.pointer-glow {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(circle 118px at var(--pointer-x) var(--pointer-y),
+      rgba(255,255,255,var(--pointer-white, .19)) 0%,
+      rgba(255,255,255,.10) 22%,
+      var(--pointer-tint, rgba(105,190,255,.11)) 44%,
+      rgba(255,255,255,0) 72%);
+  filter: saturate(var(--pointer-saturation, 150%));
+  transition: opacity .28s ease;
+  will-change: opacity;
+}
+
+.app-shell.is-pointer-active .pointer-glow {
+  opacity: var(--pointer-opacity, .58);
+}
+
+.pointer-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: var(--pointer-rim-opacity, .34);
+  background:
+    radial-gradient(circle 76px at var(--pointer-x) var(--pointer-y),
+      transparent 58%,
+      rgba(255,255,255,.23) 62%,
+      rgba(255,255,255,0) 70%);
+  filter: blur(1px);
+}
+
+.ripple-layer {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.liquid-ripple {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-radius: 50%;
+  border: 1px solid var(--ripple-edge, rgba(255,255,255,.62));
+  background:
+    radial-gradient(circle,
+      var(--ripple-core, rgba(255,255,255,.20)) 0%,
+      rgba(255,255,255,.08) 36%,
+      transparent 68%);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.06),
+    0 0 24px var(--ripple-glow, rgba(127,186,255,.12));
+  animation: liquidRipple .78s cubic-bezier(.16,1,.3,1) forwards;
+  will-change: transform, opacity;
+}
+
+.liquid-ripple::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 1px solid var(--ripple-chroma, rgba(132,198,255,.14));
+}
+
+@keyframes liquidDriftA {
+  0%   { transform: translate3d(-5%, -2%, 0) scale(1.00) rotate(0deg); }
+  45%  { transform: translate3d(13%, 8%, 0) scale(1.13) rotate(12deg); }
+  100% { transform: translate3d(4%, 21%, 0) scale(.96) rotate(-7deg); }
+}
+
+@keyframes liquidDriftB {
+  0%   { transform: translate3d(4%, -8%, 0) scale(1.08) rotate(0deg); }
+  48%  { transform: translate3d(-16%, 13%, 0) scale(.96) rotate(-13deg); }
+  100% { transform: translate3d(-4%, 24%, 0) scale(1.14) rotate(8deg); }
+}
+
+@keyframes liquidDriftC {
+  0%   { transform: translate3d(7%, 4%, 0) scale(.98) rotate(0deg); }
+  52%  { transform: translate3d(-12%, -16%, 0) scale(1.13) rotate(14deg); }
+  100% { transform: translate3d(-22%, -4%, 0) scale(1.02) rotate(-9deg); }
+}
+
+@keyframes liquidDriftD {
+  0%   { transform: translate3d(-4%, 5%, 0) scale(1.04) rotate(0deg); }
+  50%  { transform: translate3d(17%, -16%, 0) scale(1.15) rotate(-11deg); }
+  100% { transform: translate3d(23%, 2%, 0) scale(.94) rotate(7deg); }
+}
+
+@keyframes liquidDriftE {
+  0%   { transform: translate3d(-10%, -4%, 0) scale(.88); }
+  48%  { transform: translate3d(13%, 16%, 0) scale(1.18); }
+  100% { transform: translate3d(-5%, 28%, 0) scale(1.02); }
+}
+
+@keyframes liquidRipple {
+  0% {
+    opacity: .82;
+    transform: scale(.72);
+  }
+  32% {
+    opacity: .56;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(18);
+  }
+}
+
+/* Clear keeps the motion airy and understated. */
+:root[data-theme="clear"] .app-shell {
+  --flow-opacity: .32;
+  --flow-e-opacity: .23;
+  --flow-blur: 50px;
+  --flow-cyan-core: rgba(207,246,255,.54);
+  --flow-cyan: rgba(72,190,247,.20);
+  --flow-violet-core: rgba(243,239,255,.46);
+  --flow-violet: rgba(157,128,240,.14);
+  --flow-pink-core: rgba(255,241,250,.42);
+  --flow-pink: rgba(237,126,195,.11);
+  --flow-aqua-core: rgba(221,255,250,.48);
+  --flow-aqua: rgba(61,211,188,.13);
+  --flow-blue-core: rgba(238,247,255,.42);
+  --flow-blue: rgba(96,154,233,.10);
+  --pointer-opacity: .46;
+  --pointer-white: .20;
+  --pointer-tint: rgba(99,183,244,.095);
+  --pointer-saturation: 138%;
+  --pointer-rim-opacity: .28;
+  --ripple-edge: rgba(255,255,255,.58);
+  --ripple-core: rgba(255,255,255,.18);
+  --ripple-glow: rgba(113,181,244,.10);
+  --ripple-chroma: rgba(105,185,244,.12);
+}
+
+:root[data-theme="clear"] .flow-orb-a { animation-duration: 27s; }
+:root[data-theme="clear"] .flow-orb-b { animation-duration: 33s; }
+:root[data-theme="clear"] .flow-orb-c { animation-duration: 30s; }
+:root[data-theme="clear"] .flow-orb-d { animation-duration: 36s; }
+:root[data-theme="clear"] .flow-orb-e { animation-duration: 34s; }
+
+/* Prism has a richer moving spectrum and a lightly chromatic pointer response. */
+:root[data-theme="prism"] .app-shell {
+  --flow-opacity: .52;
+  --flow-e-opacity: .38;
+  --flow-blur: 45px;
+  --flow-cyan-core: rgba(192,250,255,.70);
+  --flow-cyan: rgba(26,205,255,.32);
+  --flow-violet-core: rgba(237,225,255,.62);
+  --flow-violet: rgba(138,82,255,.26);
+  --flow-pink-core: rgba(255,223,249,.64);
+  --flow-pink: rgba(250,77,192,.25);
+  --flow-aqua-core: rgba(211,255,243,.58);
+  --flow-aqua: rgba(32,221,177,.22);
+  --flow-blue-core: rgba(222,235,255,.58);
+  --flow-blue: rgba(70,108,255,.21);
+  --pointer-opacity: .72;
+  --pointer-white: .18;
+  --pointer-tint: rgba(101,180,255,.16);
+  --pointer-saturation: 195%;
+  --pointer-rim-opacity: .44;
+  --ripple-edge: rgba(255,255,255,.68);
+  --ripple-core: rgba(255,255,255,.19);
+  --ripple-glow: rgba(112,103,255,.19);
+  --ripple-chroma: rgba(250,89,202,.24);
+}
+
+:root[data-theme="prism"] .pointer-glow {
+  background:
+    radial-gradient(circle 84px at var(--pointer-x) var(--pointer-y),
+      rgba(255,255,255,.24) 0%,
+      rgba(255,255,255,.09) 28%,
+      transparent 66%),
+    radial-gradient(circle 170px at var(--pointer-x) var(--pointer-y),
+      rgba(72,211,255,.12) 0%,
+      rgba(139,99,255,.085) 38%,
+      rgba(245,91,203,.075) 58%,
+      transparent 76%);
+}
+
+:root[data-theme="prism"] .liquid-ripple {
+  box-shadow:
+    -3px 0 14px rgba(58,207,255,.15),
+    3px 0 14px rgba(242,86,202,.14),
+    0 0 26px rgba(118,95,255,.14);
+}
+
+:root[data-theme="prism"] .flow-orb-a { animation-duration: 18s; }
+:root[data-theme="prism"] .flow-orb-b { animation-duration: 22s; }
+:root[data-theme="prism"] .flow-orb-c { animation-duration: 20s; }
+:root[data-theme="prism"] .flow-orb-d { animation-duration: 25s; }
+:root[data-theme="prism"] .flow-orb-e { animation-duration: 23s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-field {
+    transform: none !important;
+  }
+
+  .flow-orb {
+    animation: none !important;
+  }
+
+  .pointer-glow,
+  .pointer-glow::after {
+    display: none;
+  }
+
+  .liquid-ripple {
+    animation: none !important;
+    display: none;
+  }
+}
