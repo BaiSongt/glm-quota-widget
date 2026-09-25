@@ -2912,3 +2912,103 @@ footer {
     min-height: 34px;
   }
 }
+
+
+/* Daylight readability pass — stronger hierarchy for Clear / Prism */
+:root[data-theme="clear"] {
+  --text: #1a2f49;
+  --text-strong: #0b1f36;
+  --muted: #516983;
+  --muted-soft: #687f98;
+  --ios-text-1: #0f2239;
+  --ios-text-2: #4f6680;
+  --ios-text-3: #667b94;
+}
+
+:root[data-theme="prism"] {
+  --text: #1b2f4a;
+  --text-strong: #0c1f37;
+  --muted: #526983;
+  --muted-soft: #6a8099;
+  --ios-text-1: #10233a;
+  --ios-text-2: #506781;
+  --ios-text-3: #687d96;
+}
+
+/* Primary information must remain readable across moving cyan / violet substrate. */
+:root[data-theme="clear"] .title,
+:root[data-theme="clear"] .summary-card strong,
+:root[data-theme="clear"] .account-title,
+:root[data-theme="clear"] .metric-value,
+:root[data-theme="clear"] h2,
+:root[data-theme="clear"] .add-btn,
+:root[data-theme="prism"] .title,
+:root[data-theme="prism"] .summary-card strong,
+:root[data-theme="prism"] .account-title,
+:root[data-theme="prism"] .metric-value,
+:root[data-theme="prism"] h2,
+:root[data-theme="prism"] .add-btn {
+  color: #0d2138;
+}
+
+/* Collapsed quota summary is operational data, not tertiary copy. */
+:root[data-theme="clear"] .account-collapsed-summary,
+:root[data-theme="prism"] .account-collapsed-summary {
+  color: #3f668f;
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* Secondary copy: sufficiently dark to survive bright refracted regions. */
+:root[data-theme="clear"] .subtitle,
+:root[data-theme="clear"] .summary-card span,
+:root[data-theme="clear"] .account-meta,
+:root[data-theme="clear"] .metric-label,
+:root[data-theme="clear"] .reset,
+:root[data-theme="clear"] label,
+:root[data-theme="clear"] .hint,
+:root[data-theme="prism"] .subtitle,
+:root[data-theme="prism"] .summary-card span,
+:root[data-theme="prism"] .account-meta,
+:root[data-theme="prism"] .metric-label,
+:root[data-theme="prism"] .reset,
+:root[data-theme="prism"] label,
+:root[data-theme="prism"] .hint {
+  color: #536b85;
+}
+
+/* Right-side reset/weekly state and footer stay quieter, but no longer wash out. */
+:root[data-theme="clear"] .account-collapsed-meta,
+:root[data-theme="clear"] footer,
+:root[data-theme="clear"] .text-btn,
+:root[data-theme="prism"] .account-collapsed-meta,
+:root[data-theme="prism"] footer,
+:root[data-theme="prism"] .text-btn {
+  color: #627a94;
+  opacity: 1;
+}
+
+/* Controls must not disappear against the light glass. */
+:root[data-theme="clear"] .icon-btn,
+:root[data-theme="clear"] .account-toggle,
+:root[data-theme="clear"] .account-icon-btn,
+:root[data-theme="prism"] .icon-btn,
+:root[data-theme="prism"] .account-toggle,
+:root[data-theme="prism"] .account-icon-btn {
+  color: #48647f;
+}
+
+:root[data-theme="clear"] .best,
+:root[data-theme="prism"] .best {
+  font-weight: 700;
+}
+
+/* A very small text separation from specular highlights, without visible glow. */
+:root[data-theme="clear"] .title,
+:root[data-theme="clear"] .summary-card strong,
+:root[data-theme="clear"] .account-title,
+:root[data-theme="prism"] .title,
+:root[data-theme="prism"] .summary-card strong,
+:root[data-theme="prism"] .account-title {
+  text-shadow: 0 1px 0 rgba(255,255,255,.18);
+}
