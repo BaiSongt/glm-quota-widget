@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:;" />
+  <title>GLM Quota Widget</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="titlebar">
+      <div class="brand">
+        <div class="logo">G</div>
+        <div>
+          <div class="title">GLM Quota</div>
+          <div class="subtitle">Multi-account monitor</div>
+        </div>
+      </div>
+      <div class="title-actions">
+        <button id="refreshBtn" class="icon-btn" title="刷新全部">↻</button>
+        <button id="settingsBtn" class="icon-btn" title="设置">⚙</button>
+        <button id="hideBtn" class="icon-btn" title="隐藏">—</button>
+      </div>
+    </header>
+
+    <section id="summary" class="summary"></section>
+    <section id="accounts" class="accounts"></section>
+
+    <button id="addBtn" class="add-btn">＋ 添加 GLM 账号</button>
+    <footer>
+      <span id="updatedAt">尚未刷新</span>
+      <button id="quitBtn" class="text-btn">退出</button>
+    </footer>
+  </main>
+
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <section class="modal" id="accountModal">
+      <div class="modal-head">
+        <h2 id="accountModalTitle">添加账号</h2>
+        <button class="icon-btn close-modal">×</button>
+      </div>
+      <form id="accountForm">
+        <input id="accountId" type="hidden" />
+        <label>账号名称<input id="accountName" required placeholder="例如：GLM 主号" /></label>
+        <label>平台
+          <select id="platform">
+            <option value="zhipu">智谱 BigModel（国内）</option>
+            <option value="zai">Z.ai（国际）</option>
+          </select>
+        </label>
+        <label>API Endpoint <input id="endpoint" placeholder="留空使用平台默认地址" /></label>
+        <label>API Key <input id="apiKey" type="password" autocomplete="off" placeholder="编辑时留空表示不修改" /></label>
+        <p class="hint">API Key 仅保存在本机，并使用 Electron safeStorage 加密。</p>
+        <div class="form-actions">
+          <button type="button" class="secondary close-modal">取消</button>
+          <button type="submit" class="primary">保存并测试</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="modal hidden" id="settingsModal">
+      <div class="modal-head">
+        <h2>设置</h2>
+        <button class="icon-btn close-modal">×</button>
+      </div>
+      <form id="settingsForm">
+        <label>自动刷新（分钟）<input id="refreshMinutes" type="number" min="1" max="60" /></label>
+        <label>黄色提醒阈值（%）<input id="warnAt" type="number" min="1" max="99" /></label>
+        <label>红色提醒阈值（%）<input id="criticalAt" type="number" min="2" max="100" /></label>
+        <label class="check"><input id="launchAtLogin" type="checkbox" /> Windows 登录后自动启动</label>
+        <div class="form-actions">
+          <button type="button" class="secondary close-modal">取消</button>
+          <button type="submit" class="primary">保存设置</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="./renderer.js"></script>
+</body>
+</html>
