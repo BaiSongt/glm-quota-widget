@@ -1,6 +1,6 @@
 {
   "name": "glm-quota-widget",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A lightweight multi-account desktop widget for GLM Coding Plan quota monitoring.",
   "main": "src/main/main.js",
   "author": "BaiSongt",
