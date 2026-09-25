@@ -46,7 +46,11 @@
       "artifactName": "GLM-Quota-Widget-${version}-${arch}.${ext}",
       "icon": "assets/icons/app.png"
     },
+    "portable": {
+      "artifactName": "GLM-Quota-Widget-${version}-portable-${arch}.${ext}"
+    },
     "nsis": {
+      "artifactName": "GLM-Quota-Widget-${version}-setup-${arch}.${ext}",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
