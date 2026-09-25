@@ -2735,3 +2735,37 @@ footer {
     transition: none !important;
   }
 }
+
+
+/* Final header controls — transparent buttons inside one shared glass capsule */
+.title-actions .icon-btn {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.title-actions .icon-btn:hover {
+  border-color: rgba(255,255,255,.18) !important;
+  background: rgba(255,255,255,.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.20) !important;
+}
+
+.title-actions .icon-btn:active {
+  background: rgba(255,255,255,.15) !important;
+  transform: scale(.95);
+}
+
+:root[data-theme="midnight"] .title-actions .icon-btn {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="midnight"] .title-actions .icon-btn:hover {
+  color: #eaf3ff;
+  border-color: rgba(91,214,201,.10) !important;
+  background: rgba(91,214,201,.055) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
