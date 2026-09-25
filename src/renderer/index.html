@@ -39,7 +39,7 @@
     <section id="summary" class="summary"></section>
     <section id="accounts" class="accounts"></section>
 
-    <button id="addBtn" class="add-btn">＋ 添加 GLM 账号</button>
+    <button id="addBtn" class="add-btn">＋ 添加账号</button>
     <footer>
       <span id="updatedAt">尚未刷新</span>
       <button id="quitBtn" class="text-btn">退出</button>
@@ -57,8 +57,11 @@
         <label>账号名称<input id="accountName" required placeholder="例如：GLM 主号" /></label>
         <label>平台
           <select id="platform">
-            <option value="zhipu">智谱 BigModel（国内）</option>
-            <option value="zai">Z.ai（国际）</option>
+            <option value="zhipu">智谱 GLM · BigModel（国内）</option>
+            <option value="zai">智谱 GLM · Z.ai（国际）</option>
+            <option value="kimi">Kimi · 月之暗面（国内）</option>
+            <option value="kimi-intl">Kimi · Moonshot AI（国际）</option>
+            <option value="deepseek">DeepSeek · 深度求索</option>
           </select>
         </label>
         <label>API Endpoint <input id="endpoint" placeholder="留空使用平台默认地址" /></label>

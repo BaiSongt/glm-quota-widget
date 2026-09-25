@@ -1,7 +1,7 @@
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { app, BrowserWindow, ipcMain, Menu, Tray, nativeImage, Notification, screen } = require('electron');
-const { fetchAccountQuota } = require('./quota');
+const { fetchAccountQuota, PROVIDER_PLATFORMS } = require('./quota');
 const { loadConfig, saveConfig, encryptSecret, decryptSecret, publicConfig } = require('./store');
 
 let mainWindow;
@@ -107,9 +107,18 @@ function updateTrayMenu() {
   if (!tray) return;
   const accountItems = config.accounts.slice(0, 6).map((account) => {
     const state = quotaByAccount.get(account.id);
-    const pct = state?.data?.session?.percentage;
+    const data = state?.data;
+    const pct = data?.session?.percentage;
+    let text;
+    if (Number.isFinite(pct)) {
+      text = `${pct}%`;
+    } else if (data?.kind === 'balance' && Number.isFinite(data.balance?.available)) {
+      text = `余额 ${data.balance.currency === 'CNY' ? '¥' : ''}${data.balance.available.toFixed(2)}`;
+    } else {
+      text = state?.loading ? '刷新中' : '—';
+    }
     return {
-      label: `${account.name}: ${Number.isFinite(pct) ? `${pct}%` : state?.loading ? '刷新中' : '—'}`,
+      label: `${account.name}: ${text}`,
       enabled: false,
     };
   });
@@ -222,7 +231,7 @@ function setupIpc() {
     const account = {
       id: existing?.id || crypto.randomUUID(),
       name,
-      platform: input?.platform === 'zai' ? 'zai' : 'zhipu',
+      platform: PROVIDER_PLATFORMS.includes(input?.platform) ? input.platform : 'zhipu',
       endpoint: String(input?.endpoint || '').trim(),
       secret: existing?.secret || '',
     };

@@ -43,7 +43,24 @@ function iconButton(action, accountId, label, extraClass = '') {
   return `<button class="account-icon-btn ${extraClass}" data-action="${action}" data-id="${accountId}" title="${label}" aria-label="${label}">${accountIcons[action]}</button>`;
 }
 
+const PLATFORM_LABELS = {
+  zhipu: 'BigModel',
+  zai: 'Z.ai',
+  kimi: 'Kimi',
+  'kimi-intl': 'Kimi Intl',
+  deepseek: 'DeepSeek',
+};
+
+function fmtMoney(value, currency) {
+  if (!Number.isFinite(value)) return '—';
+  const amount = value.toFixed(2);
+  return currency === 'CNY' ? `¥${amount}` : `${amount} ${currency || ''}`.trim();
+}
+
 function compactQuotaSummary(data) {
+  if (data?.kind === 'balance') {
+    return `余额 ${fmtMoney(data.balance?.available, data.balance?.currency)}`;
+  }
   const session = Number.isFinite(data?.session?.percentage) ? `5 小时 ${data.session.percentage}%` : '5 小时 —';
   if (!data?.tools) return session;
   const used = Number(data.tools.used || 0).toLocaleString();
@@ -52,6 +69,12 @@ function compactQuotaSummary(data) {
 }
 
 function weeklySummary(data) {
+  if (data?.kind === 'balance') {
+    const parts = [];
+    if (Number.isFinite(data.balance?.cash)) parts.push(`现金 ${fmtMoney(data.balance.cash, data.balance.currency)}`);
+    if (Number.isFinite(data.balance?.voucher)) parts.push(`赠送 ${fmtMoney(data.balance.voucher, data.balance.currency)}`);
+    return parts.join(' · ') || '余额正常';
+  }
   return Number.isFinite(data?.weekly?.percentage) ? `7 天 ${data.weekly.percentage}%` : '7 天无数据';
 }
 
@@ -220,13 +243,39 @@ function metric(label, data, fallback = '—') {
   const pct = Number.isFinite(data?.percentage) ? data.percentage : null;
   const value = pct == null ? fallback : `${pct}%`;
   const cls = severity(pct);
+  const used = Number(data?.used);
+  const total = Number(data?.total);
+  const tokens = Number.isFinite(used)
+    ? `<div class="reset tokens">累计 ${used.toLocaleString()}${Number.isFinite(total) && total > 0 ? ` / ${total.toLocaleString()}` : ''} tokens</div>`
+    : '';
   return `
     <div class="metric">
       <div class="metric-label">${label}</div>
       <div class="bar ${cls}"><i style="width:${pct == null ? 0 : pct}%"></i></div>
       <div class="metric-value">${value}</div>
     </div>
+    ${tokens}
     ${data?.nextResetTime ? `<div class="reset">${fmtReset(data.nextResetTime)}</div>` : ''}
+  `;
+}
+
+function balanceDetail(balance) {
+  if (!balance) return metric('余额', null);
+  const low = Number.isFinite(balance.available) && balance.available <= 0;
+  const items = [
+    { label: '可用余额', value: fmtMoney(balance.available, balance.currency), primary: true },
+    { label: '现金余额', value: fmtMoney(balance.cash, balance.currency) },
+    { label: '赠送 / 代金券', value: fmtMoney(balance.voucher, balance.currency) },
+  ];
+  return `
+    <div class="balance-grid">
+      ${items.map((item) => `
+        <div class="balance-item${item.primary ? ' primary' : ''}${item.primary && low ? ' warn' : ''}">
+          <div class="balance-label">${item.label}</div>
+          <div class="balance-value">${item.value}</div>
+        </div>`).join('')}
+    </div>
+    ${balance.isAvailable === false ? '<div class="reset tokens">余额不足，API 调用可能被拒绝</div>' : ''}
   `;
 }
 
@@ -267,8 +316,8 @@ function render() {
       <div class="empty">
         <div class="empty-content">
           <div class="empty-mark" aria-hidden="true"><span>G</span></div>
-          <div class="empty-title">还没有 GLM 账号</div>
-          <div class="empty-copy">添加 API Key 后，可同时查看多个账号的<br><strong>5 小时额度 · 7 天额度 · MCP / Web 用量</strong></div>
+          <div class="empty-title">还没有账号</div>
+          <div class="empty-copy">添加 API Key 后，可同时监控多个平台的<br><strong>GLM 额度 · Kimi 余额 · DeepSeek 余额</strong></div>
         </div>
       </div>`;
     els.updatedAt.textContent = '尚未配置账号';
@@ -291,9 +340,12 @@ function render() {
     const d = q.data || {};
     latest = Math.max(latest, Number(d.fetchedAt || 0));
     const isBest = Number.isFinite(d.session?.percentage) && d.session.percentage === minPct;
-    const platformLabel = account.platform === 'zai' ? 'Z.ai' : 'BigModel';
+    const platformLabel = PLATFORM_LABELS[account.platform] || 'BigModel';
+    const isBalance = d.kind === 'balance';
     const expanded = account.id === expandedAccountId;
-    const resetText = d.session?.nextResetTime ? fmtReset(d.session.nextResetTime) : '暂无重置时间';
+    const resetText = isBalance
+      ? (q.loading ? '刷新中…' : '余额监控')
+      : (d.session?.nextResetTime ? fmtReset(d.session.nextResetTime) : '暂无重置时间');
     return `
       <article class="account-card accordion-card ${expanded ? 'is-expanded' : 'is-collapsed'} ${q.loading ? 'loading' : ''}" data-account-id="${account.id}">
         <div class="account-accordion-head">
@@ -319,9 +371,9 @@ function render() {
         </div>
         <div class="account-body-shell">
           <div class="account-body">
-            ${metric('5 小时', d.session)}
-            ${metric('7 天', d.weekly)}
-            ${toolsMetric(d.tools)}
+            ${isBalance
+              ? balanceDetail(d.balance)
+              : `${metric('5 小时', d.session)}${metric('7 天', d.weekly)}${toolsMetric(d.tools)}`}
             ${q.error ? `<div class="error">${esc(q.error)}</div>` : ''}
           </div>
         </div>
@@ -348,7 +400,7 @@ function showAccountModal(account = null) {
   els.platform.value = account?.platform || 'zhipu';
   els.endpoint.value = account?.endpoint || '';
   els.apiKey.value = '';
-  els.apiKey.placeholder = account?.hasKey ? '留空表示保留现有 Key' : '粘贴 GLM API Key';
+  els.apiKey.placeholder = account?.hasKey ? '留空表示保留现有 Key' : '粘贴 API Key';
   setTimeout(() => els.accountName.focus(), 0);
 }
 

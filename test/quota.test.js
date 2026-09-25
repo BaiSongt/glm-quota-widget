@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { parseQuotaResponse, parseSubscriptionResponse, endpointFor } = require('../src/main/quota');
+const { parseQuotaResponse, parseSubscriptionResponse, parseKimiBalance, parseDeepseekBalance, endpointFor } = require('../src/main/quota');
 
 test('parses session, weekly and time limits', () => {
   const parsed = parseQuotaResponse({
@@ -26,5 +26,37 @@ test('subscription picks active plan', () => {
 test('chooses platform endpoint and strips trailing slash', () => {
   assert.equal(endpointFor({ platform: 'zhipu' }), 'https://open.bigmodel.cn');
   assert.equal(endpointFor({ platform: 'zai' }), 'https://api.z.ai');
+  assert.equal(endpointFor({ platform: 'kimi' }), 'https://api.moonshot.cn');
+  assert.equal(endpointFor({ platform: 'kimi-intl' }), 'https://api.moonshot.ai');
+  assert.equal(endpointFor({ platform: 'deepseek' }), 'https://api.deepseek.com');
   assert.equal(endpointFor({ endpoint: 'https://example.com/' }), 'https://example.com');
+});
+
+test('parses Kimi balance response', () => {
+  const balance = parseKimiBalance({
+    code: 0,
+    data: { available_balance: 49.58894, voucher_balance: 46.58893, cash_balance: 3.00001 },
+    status: true,
+  });
+  assert.equal(balance.currency, 'CNY');
+  assert.equal(balance.available, 49.58894);
+  assert.equal(balance.voucher, 46.58893);
+  assert.equal(balance.cash, 3.00001);
+  assert.equal(balance.isAvailable, true);
+  assert.throws(() => parseKimiBalance({}), /data is missing/);
+});
+
+test('parses DeepSeek balance response', () => {
+  const balance = parseDeepseekBalance({
+    is_available: true,
+    balance_infos: [
+      { currency: 'CNY', total_balance: '0.37', granted_balance: '0.00', topped_up_balance: '0.37' },
+    ],
+  });
+  assert.equal(balance.currency, 'CNY');
+  assert.equal(balance.available, 0.37);
+  assert.equal(balance.cash, 0.37);
+  assert.equal(balance.voucher, 0);
+  assert.equal(balance.isAvailable, true);
+  assert.throws(() => parseDeepseekBalance({ balance_infos: [] }), /balance_infos is missing/);
 });

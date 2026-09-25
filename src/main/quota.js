@@ -1,7 +1,16 @@
-const DEFAULT_ENDPOINTS = {
-  zhipu: 'https://open.bigmodel.cn',
-  zai: 'https://api.z.ai',
+const PROVIDERS = {
+  zhipu: { kind: 'glm', endpoint: 'https://open.bigmodel.cn' },
+  zai: { kind: 'glm', endpoint: 'https://api.z.ai' },
+  kimi: { kind: 'kimi', endpoint: 'https://api.moonshot.cn' },
+  'kimi-intl': { kind: 'kimi', endpoint: 'https://api.moonshot.ai' },
+  deepseek: { kind: 'deepseek', endpoint: 'https://api.deepseek.com' },
 };
+
+const PROVIDER_PLATFORMS = Object.keys(PROVIDERS);
+
+const DEFAULT_ENDPOINTS = Object.fromEntries(
+  Object.entries(PROVIDERS).map(([platform, provider]) => [platform, provider.endpoint]),
+);
 
 function clampPercent(value) {
   const n = Number(value);
@@ -47,10 +56,50 @@ function parseSubscriptionResponse(payload) {
   };
 }
 
+function providerFor(account) {
+  return PROVIDERS[account?.platform] || PROVIDERS.zhipu;
+}
+
 function endpointFor(account) {
   const explicit = String(account?.endpoint || '').trim().replace(/\/$/, '');
   if (explicit) return explicit;
-  return DEFAULT_ENDPOINTS[account?.platform] || DEFAULT_ENDPOINTS.zhipu;
+  return providerFor(account).endpoint;
+}
+
+function toFiniteNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseKimiBalance(payload) {
+  const data = payload?.data;
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid balance response: data is missing');
+  }
+  return {
+    currency: 'CNY',
+    available: toFiniteNumber(data.available_balance),
+    cash: toFiniteNumber(data.cash_balance),
+    voucher: toFiniteNumber(data.voucher_balance),
+    isAvailable: toFiniteNumber(data.available_balance) != null
+      ? toFiniteNumber(data.available_balance) > 0
+      : null,
+  };
+}
+
+function parseDeepseekBalance(payload) {
+  const infos = payload?.balance_infos;
+  if (!Array.isArray(infos) || !infos.length) {
+    throw new Error('Invalid balance response: balance_infos is missing');
+  }
+  const info = infos.find((item) => item?.currency === 'CNY') || infos[0];
+  return {
+    currency: info?.currency || 'CNY',
+    available: toFiniteNumber(info?.total_balance),
+    cash: toFiniteNumber(info?.topped_up_balance),
+    voucher: toFiniteNumber(info?.granted_balance),
+    isAvailable: typeof payload?.is_available === 'boolean' ? payload.is_available : null,
+  };
 }
 
 async function fetchJson(url, apiKey, timeoutMs = 12000) {
@@ -92,6 +141,30 @@ async function fetchJson(url, apiKey, timeoutMs = 12000) {
 
 async function fetchAccountQuota(account, apiKey) {
   const base = endpointFor(account);
+  const provider = providerFor(account);
+
+  if (provider.kind === 'kimi') {
+    const payload = await fetchJson(`${base}/v1/users/me/balance`, apiKey);
+    return {
+      kind: 'balance',
+      balance: parseKimiBalance(payload),
+      plan: null,
+      endpoint: base,
+      fetchedAt: Date.now(),
+    };
+  }
+
+  if (provider.kind === 'deepseek') {
+    const payload = await fetchJson(`${base}/user/balance`, apiKey);
+    return {
+      kind: 'balance',
+      balance: parseDeepseekBalance(payload),
+      plan: null,
+      endpoint: base,
+      fetchedAt: Date.now(),
+    };
+  }
+
   const quotaUrl = `${base}/api/monitor/usage/quota/limit`;
   const subscriptionUrl = `${base}/api/biz/subscription/list`;
 
@@ -104,6 +177,7 @@ async function fetchAccountQuota(account, apiKey) {
   const subscription = subscriptionResult ? parseSubscriptionResponse(subscriptionResult) : { plan: null, nextRenewTime: null };
 
   return {
+    kind: 'glm',
     ...quota,
     ...subscription,
     endpoint: base,
@@ -112,9 +186,14 @@ async function fetchAccountQuota(account, apiKey) {
 }
 
 module.exports = {
+  PROVIDERS,
+  PROVIDER_PLATFORMS,
   DEFAULT_ENDPOINTS,
+  providerFor,
   endpointFor,
   parseQuotaResponse,
   parseSubscriptionResponse,
+  parseKimiBalance,
+  parseDeepseekBalance,
   fetchAccountQuota,
 };

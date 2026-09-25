@@ -1034,12 +1034,14 @@ body {
   color: var(--ios-text-3);
 }
 
-.metric-label {
+.metric-label,
+.balance-label {
   color: var(--ios-text-2);
   font-weight: 550;
 }
 
-.metric-value {
+.metric-value,
+.balance-value {
   color: #294562;
   font-weight: 650;
 }
@@ -2331,16 +2333,16 @@ select {
 }
 
 .account-collapsed-meta {
-  width: 102px;
-  max-width: 102px;
+  width: 122px;
+  max-width: 122px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 1px;
+  gap: 2px;
   overflow: hidden;
   color: var(--ios-text-3);
-  font-size: 8px;
-  line-height: 1.3;
+  font-size: 10px;
+  line-height: 1.35;
   white-space: nowrap;
   opacity: 1;
   transition:
@@ -2499,7 +2501,60 @@ select {
   margin-top: 3px;
   margin-left: 69px;
   max-width: calc(100% - 69px);
-  font-size: 8px;
+  font-size: 9px;
+}
+
+.account-body .tokens {
+  font-weight: 600;
+}
+
+.balance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.balance-item {
+  min-width: 0;
+  padding: 7px 9px 8px;
+  border: 1px solid rgba(255,255,255,.30);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.05)),
+    rgba(255,255,255,.05);
+}
+
+.balance-item.primary {
+  border-color: rgba(91,156,243,.45);
+}
+
+.balance-item.warn {
+  border-color: rgba(239,68,68,.55);
+}
+
+.balance-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 9px;
+  font-weight: 650;
+  color: var(--ios-text-2);
+}
+
+.balance-value {
+  margin-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  color: #294562;
+}
+
+.balance-item.warn .balance-value {
+  color: var(--red, #ef4444);
 }
 
 .account-card.is-collapsed {
@@ -2513,7 +2568,7 @@ select {
 
 footer {
   min-height: 20px;
-  font-size: 8px;
+  font-size: 9px;
 }
 
 /* Third theme — Midnight */
@@ -2601,6 +2656,7 @@ footer {
 :root[data-theme="midnight"] .summary-card strong,
 :root[data-theme="midnight"] .account-title,
 :root[data-theme="midnight"] .metric-value,
+:root[data-theme="midnight"] .balance-value,
 :root[data-theme="midnight"] h2 {
   color: #f0f6ff;
 }
@@ -2609,6 +2665,7 @@ footer {
 :root[data-theme="midnight"] .summary-card span,
 :root[data-theme="midnight"] .account-meta,
 :root[data-theme="midnight"] .metric-label,
+:root[data-theme="midnight"] .balance-label,
 :root[data-theme="midnight"] .reset,
 :root[data-theme="midnight"] footer,
 :root[data-theme="midnight"] label,
@@ -2714,8 +2771,8 @@ footer {
   }
 
   .account-collapsed-meta {
-    width: 82px;
-    max-width: 82px;
+    width: 102px;
+    max-width: 102px;
   }
 
   .account-card.is-expanded .account-actions {
@@ -2789,18 +2846,18 @@ footer {
 }
 
 .account-card.is-collapsed .account-collapsed-summary {
-  max-height: 14px;
+  max-height: 15px;
   margin-top: 1px;
-  font-size: 8px;
-  line-height: 1.2;
+  font-size: 9px;
+  line-height: 1.25;
 }
 
 .account-card.is-collapsed .account-collapsed-meta {
-  width: 94px;
-  max-width: 94px;
-  gap: 0;
-  font-size: 7px;
-  line-height: 1.25;
+  width: 118px;
+  max-width: 118px;
+  gap: 1px;
+  font-size: 10px;
+  line-height: 1.3;
 }
 
 .account-card.is-collapsed .account-toggle {
@@ -2940,12 +2997,14 @@ footer {
 :root[data-theme="clear"] .summary-card strong,
 :root[data-theme="clear"] .account-title,
 :root[data-theme="clear"] .metric-value,
+:root[data-theme="clear"] .balance-value,
 :root[data-theme="clear"] h2,
 :root[data-theme="clear"] .add-btn,
 :root[data-theme="prism"] .title,
 :root[data-theme="prism"] .summary-card strong,
 :root[data-theme="prism"] .account-title,
 :root[data-theme="prism"] .metric-value,
+:root[data-theme="prism"] .balance-value,
 :root[data-theme="prism"] h2,
 :root[data-theme="prism"] .add-btn {
   color: #0d2138;
@@ -2964,6 +3023,7 @@ footer {
 :root[data-theme="clear"] .summary-card span,
 :root[data-theme="clear"] .account-meta,
 :root[data-theme="clear"] .metric-label,
+:root[data-theme="clear"] .balance-label,
 :root[data-theme="clear"] .reset,
 :root[data-theme="clear"] label,
 :root[data-theme="clear"] .hint,
@@ -2971,6 +3031,7 @@ footer {
 :root[data-theme="prism"] .summary-card span,
 :root[data-theme="prism"] .account-meta,
 :root[data-theme="prism"] .metric-label,
+:root[data-theme="prism"] .balance-label,
 :root[data-theme="prism"] .reset,
 :root[data-theme="prism"] label,
 :root[data-theme="prism"] .hint {
