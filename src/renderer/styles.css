@@ -1849,3 +1849,208 @@ input::placeholder {
     display: none;
   }
 }
+
+
+/* Rounded-window clipping pass
+   Keep every optical layer inside the same curved glass silhouette. */
+:root {
+  --radius-window: 30px;
+  --radius-panel: 24px;
+  --radius-summary: 20px;
+  --radius-control: 14px;
+}
+
+/* Clip the renderer itself so no body-level paint can leak into square corners. */
+html,
+body {
+  border-radius: var(--radius-window);
+  overflow: hidden;
+}
+
+body {
+  clip-path: inset(0 round var(--radius-window));
+}
+
+/* The animated liquid scene now owns all ambient colour.
+   Disable the legacy page-level blobs that could remain visible outside the shell. */
+body::before,
+body::after {
+  display: none !important;
+}
+
+.app-shell {
+  border: 0;
+  border-radius: var(--radius-window);
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.58),
+    inset 0 1px 0 rgba(255,255,255,.62),
+    inset 0 -1px 0 rgba(112,137,168,.09),
+    0 18px 48px rgba(24,43,69,.13);
+}
+
+.liquid-scene {
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  clip-path: inset(0 round var(--radius-window));
+}
+
+.liquid-field,
+.pointer-glow,
+.pointer-glow::after,
+.ripple-layer {
+  border-radius: inherit;
+}
+
+.titlebar,
+.title-actions,
+.summary-card,
+.account-card,
+.empty,
+.add-btn,
+.modal,
+.theme-option,
+.theme-swatch,
+.small-btn,
+.icon-btn,
+.primary,
+.secondary,
+input,
+select,
+.error,
+.best,
+.bar {
+  overflow: hidden;
+}
+
+/* Establish clipping contexts for every glass surface and its pseudo highlights. */
+.titlebar,
+.title-actions,
+.summary-card,
+.account-card,
+.empty,
+.add-btn,
+.modal,
+.theme-option,
+.theme-swatch,
+.small-btn,
+.icon-btn,
+.primary,
+.secondary {
+  position: relative;
+  isolation: isolate;
+}
+
+.titlebar {
+  border-radius: var(--radius-panel);
+}
+
+.title-actions {
+  border-radius: 18px;
+}
+
+.summary-card {
+  border-radius: var(--radius-summary);
+}
+
+.account-card,
+.empty {
+  border-radius: var(--radius-panel);
+}
+
+.add-btn {
+  border-radius: 20px;
+}
+
+.modal {
+  border-radius: 24px;
+}
+
+.small-btn,
+.icon-btn,
+.primary,
+.secondary,
+input,
+select {
+  border-radius: var(--radius-control);
+}
+
+.bar,
+.bar > i,
+.best {
+  border-radius: 999px;
+}
+
+/* Every optical/highlight layer inherits the actual surface curve. */
+.titlebar::before,
+.titlebar::after,
+.title-actions::before,
+.title-actions::after,
+.summary-card::before,
+.summary-card::after,
+.account-card::before,
+.account-card::after,
+.empty::before,
+.empty::after,
+.add-btn::before,
+.add-btn::after,
+.modal::before,
+.modal::after,
+.theme-option::before,
+.theme-option::after,
+.small-btn::before,
+.small-btn::after,
+.icon-btn::before,
+.icon-btn::after,
+.primary::before,
+.primary::after,
+.secondary::before,
+.secondary::after {
+  border-radius: inherit !important;
+}
+
+/* Replace hard white outlines with softer curved optical rims. */
+.titlebar,
+.summary-card,
+.account-card,
+.empty,
+.add-btn {
+  border-color: rgba(255,255,255,.38);
+}
+
+:root[data-theme="clear"] .titlebar,
+:root[data-theme="clear"] .summary-card,
+:root[data-theme="clear"] .account-card,
+:root[data-theme="clear"] .empty,
+:root[data-theme="clear"] .add-btn {
+  border-color: rgba(255,255,255,.34);
+}
+
+:root[data-theme="prism"] .titlebar,
+:root[data-theme="prism"] .summary-card,
+:root[data-theme="prism"] .account-card,
+:root[data-theme="prism"] .empty,
+:root[data-theme="prism"] .add-btn {
+  border-color: rgba(255,255,255,.40);
+}
+
+/* Prevent large moving/refraction layers from exposing a rectangular compositing edge. */
+.flow-orb {
+  -webkit-mask-image: radial-gradient(circle, #000 0 61%, transparent 76%);
+  mask-image: radial-gradient(circle, #000 0 61%, transparent 76%);
+}
+
+/* Narrow layouts keep the same curve hierarchy rather than reverting to sharper cards. */
+@media (max-width: 390px) {
+  :root {
+    --radius-window: 26px;
+    --radius-panel: 21px;
+    --radius-summary: 18px;
+  }
+
+  .account-card {
+    border-radius: var(--radius-panel);
+  }
+}
