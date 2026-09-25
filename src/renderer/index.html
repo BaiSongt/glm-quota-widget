@@ -19,6 +19,7 @@
       </div>
       <div class="title-actions">
         <button id="refreshBtn" class="icon-btn" title="刷新全部">↻</button>
+        <button id="themeBtn" class="icon-btn theme-toggle" title="切换液态玻璃主题">◐</button>
         <button id="settingsBtn" class="icon-btn" title="设置">⚙</button>
         <button id="hideBtn" class="icon-btn" title="隐藏">—</button>
       </div>
@@ -65,6 +66,21 @@
         <button class="icon-btn close-modal">×</button>
       </div>
       <form id="settingsForm">
+        <div class="theme-field">
+          <div class="field-label">液态玻璃主题</div>
+          <div class="theme-picker" role="radiogroup" aria-label="液态玻璃主题">
+            <label class="theme-option">
+              <input type="radio" name="theme" value="clear" />
+              <span class="theme-swatch theme-swatch-clear" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="theme-option-copy"><strong>澄明 Clear</strong><small>低雾度 · 克制高光 · 内容优先</small></span>
+            </label>
+            <label class="theme-option">
+              <input type="radio" name="theme" value="prism" />
+              <span class="theme-swatch theme-swatch-prism" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="theme-option-copy"><strong>棱彩 Prism</strong><small>高饱和 · 色散边缘 · 更强折射感</small></span>
+            </label>
+          </div>
+        </div>
         <label>自动刷新（分钟）<input id="refreshMinutes" type="number" min="1" max="60" /></label>
         <label>黄色提醒阈值（%）<input id="warnAt" type="number" min="1" max="99" /></label>
         <label>红色提醒阈值（%）<input id="criticalAt" type="number" min="2" max="100" /></label>

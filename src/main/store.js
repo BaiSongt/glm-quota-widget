@@ -7,6 +7,7 @@ const DEFAULT_CONFIG = {
   warnAt: 80,
   criticalAt: 90,
   launchAtLogin: false,
+  theme: 'clear',
   accounts: [],
   window: { x: null, y: null },
 };
@@ -24,6 +25,7 @@ function loadConfig() {
       ...parsed,
       window: { ...DEFAULT_CONFIG.window, ...(parsed.window || {}) },
       accounts: Array.isArray(parsed.accounts) ? parsed.accounts : [],
+      theme: parsed.theme === 'prism' ? 'prism' : 'clear',
     };
   } catch {
     return structuredClone(DEFAULT_CONFIG);
@@ -63,6 +65,7 @@ function publicConfig(config) {
     warnAt: config.warnAt,
     criticalAt: config.criticalAt,
     launchAtLogin: config.launchAtLogin,
+    theme: config.theme === 'prism' ? 'prism' : 'clear',
     accounts: config.accounts.map(({ secret, ...account }) => ({ ...account, hasKey: Boolean(secret) })),
   };
 }

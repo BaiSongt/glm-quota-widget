@@ -3,6 +3,7 @@ const els = {
   summary: document.getElementById('summary'),
   updatedAt: document.getElementById('updatedAt'),
   refreshBtn: document.getElementById('refreshBtn'),
+  themeBtn: document.getElementById('themeBtn'),
   settingsBtn: document.getElementById('settingsBtn'),
   hideBtn: document.getElementById('hideBtn'),
   quitBtn: document.getElementById('quitBtn'),
@@ -22,9 +23,23 @@ const els = {
   warnAt: document.getElementById('warnAt'),
   criticalAt: document.getElementById('criticalAt'),
   launchAtLogin: document.getElementById('launchAtLogin'),
+  themeOptions: Array.from(document.querySelectorAll('input[name="theme"]')),
 };
 
 let state = { config: { accounts: [] }, quota: {} };
+
+function normalizeTheme(value) {
+  return value === 'prism' ? 'prism' : 'clear';
+}
+
+function applyTheme(value) {
+  const theme = normalizeTheme(value);
+  document.documentElement.dataset.theme = theme;
+  if (els.themeBtn) {
+    els.themeBtn.textContent = theme === 'prism' ? '✦' : '◐';
+    els.themeBtn.title = theme === 'prism' ? '当前：棱彩 Prism · 点击切换' : '当前：澄明 Clear · 点击切换';
+  }
+}
 
 function esc(value) {
   return String(value ?? '').replace(/[&<>'"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c]));
@@ -87,6 +102,7 @@ function renderSummary(accounts) {
 }
 
 function render() {
+  applyTheme(state.config.theme);
   const accounts = state.config.accounts || [];
   renderSummary(accounts);
 
@@ -137,6 +153,7 @@ function render() {
 }
 
 function closeModal() {
+  applyTheme(state.config.theme);
   els.backdrop.classList.add('hidden');
   els.accountModal.classList.add('hidden');
   els.settingsModal.classList.add('hidden');
@@ -164,11 +181,33 @@ function showSettingsModal() {
   els.warnAt.value = state.config.warnAt;
   els.criticalAt.value = state.config.criticalAt;
   els.launchAtLogin.checked = Boolean(state.config.launchAtLogin);
+  const currentTheme = normalizeTheme(state.config.theme);
+  els.themeOptions.forEach((option) => { option.checked = option.value === currentTheme; });
 }
 
 els.addBtn.addEventListener('click', () => showAccountModal());
 els.settingsBtn.addEventListener('click', showSettingsModal);
 els.refreshBtn.addEventListener('click', () => window.glmQuota.refresh());
+els.themeBtn.addEventListener('click', async () => {
+  const nextTheme = normalizeTheme(state.config.theme) === 'clear' ? 'prism' : 'clear';
+  applyTheme(nextTheme);
+  try {
+    state = await window.glmQuota.saveSettings({
+      refreshMinutes: state.config.refreshMinutes,
+      warnAt: state.config.warnAt,
+      criticalAt: state.config.criticalAt,
+      launchAtLogin: Boolean(state.config.launchAtLogin),
+      theme: nextTheme,
+    });
+    render();
+  } catch (error) {
+    applyTheme(state.config.theme);
+    alert(error.message || String(error));
+  }
+});
+els.themeOptions.forEach((option) => option.addEventListener('change', () => {
+  if (option.checked) applyTheme(option.value);
+}));
 els.hideBtn.addEventListener('click', () => window.glmQuota.hide());
 els.quitBtn.addEventListener('click', () => window.glmQuota.quit());
 
@@ -217,6 +256,7 @@ els.settingsForm.addEventListener('submit', async (event) => {
       warnAt: els.warnAt.value,
       criticalAt: els.criticalAt.value,
       launchAtLogin: els.launchAtLogin.checked,
+      theme: document.querySelector('input[name="theme"]:checked')?.value || 'clear',
     });
     render();
     closeModal();
